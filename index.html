@@ -3005,6 +3005,8 @@ svg .pie-slice:hover {
         <div class="pin-dot" id="pindot-1"></div>
         <div class="pin-dot" id="pindot-2"></div>
         <div class="pin-dot" id="pindot-3"></div>
+        <div class="pin-dot" id="pindot-4"></div>
+        <div class="pin-dot" id="pindot-5"></div>
       </div>
       
       <div class="pin-error-msg" id="pinErrorMsg"></div>
@@ -4879,11 +4881,11 @@ function getComputedStatus(o) {
 }
 
 // ----------------- SECURITY & PIN LOCK SCREEN -----------------
-const MASTER_DASHBOARD_PIN = '7708';
+const VALID_DASHBOARD_PINS = ['236618', '7708'];
 let currentPinInput = '';
 
 function updatePinDots() {
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 6; i++) {
     const dot = document.getElementById('pindot-' + i);
     if (dot) {
       if (i < currentPinInput.length) {
@@ -4896,12 +4898,14 @@ function updatePinDots() {
 }
 
 function enterPinDigit(digit) {
-  if (currentPinInput.length >= 4) return;
+  if (currentPinInput.length >= 6) return;
   currentPinInput += String(digit);
   updatePinDots();
   const errMsg = document.getElementById('pinErrorMsg');
   if (errMsg) errMsg.textContent = '';
-  if (currentPinInput.length === 4) {
+  if (VALID_DASHBOARD_PINS.includes(currentPinInput)) {
+    setTimeout(submitPin, 120);
+  } else if (currentPinInput.length === 6) {
     setTimeout(submitPin, 150);
   }
 }
@@ -4925,7 +4929,7 @@ function unlockDashboard() {
 }
 
 function submitPin() {
-  if (currentPinInput === MASTER_DASHBOARD_PIN) {
+  if (VALID_DASHBOARD_PINS.includes(currentPinInput)) {
     unlockDashboard();
   } else {
     const card = document.getElementById('pinLockCard');
