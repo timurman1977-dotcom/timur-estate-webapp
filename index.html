@@ -2842,6 +2842,148 @@ svg .pie-slice:hover {
   color: var(--color-danger);
 }
 
+/* ==========================================================================
+   PIN LOCK SCREEN OVERLAY (Security for Dashboard & Web App)
+   ========================================================================== */
+.pin-lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: radial-gradient(circle at 50% 30%, #1e293b 0%, #0b0f17 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.pin-lock-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.pin-lock-card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(96, 165, 250, 0.15);
+}
+
+.pin-lock-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, hsl(217, 90%, 65%) 0%, hsl(262, 70%, 60%) 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: white;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.35);
+}
+
+.pin-lock-title {
+  font-family: var(--font-family-title, sans-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.pin-lock-subtitle {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 24px;
+}
+
+.pin-dots-container {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.pin-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pin-dot.filled {
+  background: #60a5fa;
+  border-color: #60a5fa;
+  box-shadow: 0 0 12px rgba(96, 165, 250, 0.8);
+  transform: scale(1.15);
+}
+
+.pin-error-msg {
+  height: 20px;
+  font-size: 12px;
+  color: #f87171;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.pin-key {
+  height: 56px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pin-key:hover, .pin-key:active {
+  background: rgba(96, 165, 250, 0.2);
+  border-color: rgba(96, 165, 250, 0.4);
+  transform: scale(0.96);
+}
+
+.pin-key-action {
+  font-size: 16px;
+  color: #94a3b8;
+}
+
+.pin-footer-hint {
+  font-size: 11px;
+  color: #64748b;
+}
+
+@keyframes pinShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+.pin-lock-card.shake {
+  animation: pinShake 0.35s ease-in-out;
+}
+
 
 
 
@@ -2850,6 +2992,43 @@ svg .pie-slice:hover {
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+
+  <!-- PIN LOCK OVERLAY (Защита дашборда) -->
+  <div id="pinLockOverlay" class="pin-lock-overlay">
+    <div class="pin-lock-card" id="pinLockCard">
+      <div class="pin-lock-icon">🔐</div>
+      <h2 class="pin-lock-title">Недвижимость Т.Ш.</h2>
+      <p class="pin-lock-subtitle">Закрытый дашборд владельца</p>
+      
+      <div class="pin-dots-container" id="pinDotsContainer">
+        <div class="pin-dot" id="pindot-0"></div>
+        <div class="pin-dot" id="pindot-1"></div>
+        <div class="pin-dot" id="pindot-2"></div>
+        <div class="pin-dot" id="pindot-3"></div>
+      </div>
+      
+      <div class="pin-error-msg" id="pinErrorMsg"></div>
+      
+      <div class="pin-keypad">
+        <button class="pin-key" onclick="enterPinDigit('1')">1</button>
+        <button class="pin-key" onclick="enterPinDigit('2')">2</button>
+        <button class="pin-key" onclick="enterPinDigit('3')">3</button>
+        <button class="pin-key" onclick="enterPinDigit('4')">4</button>
+        <button class="pin-key" onclick="enterPinDigit('5')">5</button>
+        <button class="pin-key" onclick="enterPinDigit('6')">6</button>
+        <button class="pin-key" onclick="enterPinDigit('7')">7</button>
+        <button class="pin-key" onclick="enterPinDigit('8')">8</button>
+        <button class="pin-key" onclick="enterPinDigit('9')">9</button>
+        <button class="pin-key pin-key-action" onclick="clearPin()">✕</button>
+        <button class="pin-key" onclick="enterPinDigit('0')">0</button>
+        <button class="pin-key pin-key-action" onclick="submitPin()">✓</button>
+      </div>
+      
+      <div class="pin-footer-hint">
+        Защищено сквозным доступом владельца
+      </div>
+    </div>
+  </div>
 
   <div class="app-container">
     
@@ -3949,6 +4128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function init() {
+  checkInitialLockState();
   initTelegramWebApp();
   initTheme();
   setupNavigation();
@@ -4696,6 +4876,107 @@ function getComputedStatus(o) {
     return { name: 'Продажа', cls: 'sale', code: 'sale' };
   }
   return { name: o.status, cls: o.status, code: o.status };
+}
+
+// ----------------- SECURITY & PIN LOCK SCREEN -----------------
+const MASTER_DASHBOARD_PIN = '7708';
+let currentPinInput = '';
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('pindot-' + i);
+    if (dot) {
+      if (i < currentPinInput.length) {
+        dot.classList.add('filled');
+      } else {
+        dot.classList.remove('filled');
+      }
+    }
+  }
+}
+
+function enterPinDigit(digit) {
+  if (currentPinInput.length >= 4) return;
+  currentPinInput += String(digit);
+  updatePinDots();
+  const errMsg = document.getElementById('pinErrorMsg');
+  if (errMsg) errMsg.textContent = '';
+  if (currentPinInput.length === 4) {
+    setTimeout(submitPin, 150);
+  }
+}
+
+function clearPin() {
+  currentPinInput = '';
+  updatePinDots();
+  const errMsg = document.getElementById('pinErrorMsg');
+  if (errMsg) errMsg.textContent = '';
+}
+
+function unlockDashboard() {
+  try {
+    sessionStorage.setItem('tsh_estate_unlocked', 'true');
+    localStorage.setItem('tsh_estate_device_trusted', 'true');
+  } catch(e) {}
+  const overlay = document.getElementById('pinLockOverlay');
+  if (overlay) {
+    overlay.classList.add('hidden');
+  }
+}
+
+function submitPin() {
+  if (currentPinInput === MASTER_DASHBOARD_PIN) {
+    unlockDashboard();
+  } else {
+    const card = document.getElementById('pinLockCard');
+    const errMsg = document.getElementById('pinErrorMsg');
+    if (errMsg) errMsg.textContent = 'Неверный PIN-код доступа';
+    if (card) {
+      card.classList.remove('shake');
+      void card.offsetWidth;
+      card.classList.add('shake');
+    }
+    currentPinInput = '';
+    updatePinDots();
+  }
+}
+
+function checkInitialLockState() {
+  // 1. Check if already unlocked in this session or device trusted
+  try {
+    if (sessionStorage.getItem('tsh_estate_unlocked') === 'true' || localStorage.getItem('tsh_estate_device_trusted') === 'true') {
+      const overlay = document.getElementById('pinLockOverlay');
+      if (overlay) overlay.classList.add('hidden');
+      return;
+    }
+  } catch(e) {}
+
+  // 2. Check if inside Telegram WebApp with Timur's verified Telegram ID
+  try {
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+      if (tgUser && (String(tgUser.id) === '169998217' || tgUser.username === 'Timurman77')) {
+        console.log('Verified owner Telegram user ID:', tgUser.id);
+        unlockDashboard();
+        return;
+      }
+    }
+  } catch(e) {}
+
+  // 3. Listen to keyboard numbers (0-9, Backspace, Enter)
+  window.addEventListener('keydown', (e) => {
+    const overlay = document.getElementById('pinLockOverlay');
+    if (overlay && !overlay.classList.contains('hidden')) {
+      if (e.key >= '0' && e.key <= '9') {
+        enterPinDigit(e.key);
+      } else if (e.key === 'Backspace') {
+        currentPinInput = currentPinInput.slice(0, -1);
+        updatePinDots();
+      } else if (e.key === 'Enter') {
+        submitPin();
+      }
+    }
+  });
 }
 
 // ----------------- TELEGRAM WEB APP INTEGRATION -----------------
