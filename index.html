@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Недвижимость — Панель управления (V2.1)</title>
+  <title>Недвижимость Т.Ш. — Панель управления (v2.3)</title>
   <script>
     (function() {
       var t = localStorage.getItem('tsh_theme') || 'dark';
@@ -1861,6 +1861,75 @@ svg .pie-slice:hover {
   background: rgba(239, 68, 68, 0.35);
   box-shadow: 0 0 24px rgba(239, 68, 68, 0.8);
 }
+/* v2.3: блок «Что сделать сегодня» */
+.today-actions-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 18px 20px;
+}
+.today-head { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-family-title); font-weight: 700; font-size: 15px; margin-bottom: 12px; color: var(--color-text); }
+.today-count { font-size: 11px; font-weight: 600; color: var(--color-text-secondary); background: var(--color-surface-variant); padding: 3px 10px; border-radius: 100px; }
+.today-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 8px; }
+.today-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--color-surface-variant); border-left: 3px solid var(--color-border); cursor: pointer; font-size: 12.5px; color: var(--color-text); transition: background .15s; }
+.today-item:hover { background: rgba(255,255,255,0.06); }
+.today-item.sev-high { border-left-color: #ef4444; }
+.today-item.sev-mid { border-left-color: #f59e0b; }
+.today-item.sev-low { border-left-color: #60a5fa; }
+.today-icon { font-size: 16px; flex-shrink: 0; }
+.today-text { flex: 1; line-height: 1.35; }
+.today-go { color: var(--color-text-secondary); }
+.today-wa { flex-shrink: 0; border: 1px solid #25d366; background: rgba(37,211,102,0.12); color: #4ade80; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 8px; cursor: pointer; }
+.today-more { margin-top: 8px; font-size: 11px; color: var(--color-text-secondary); }
+
+/* v2.3: градация просрочки — меньше «красного шума» */
+.pay-toggle-btn.status-overdue.sev-low {
+  background: rgba(249, 115, 22, 0.16);
+  color: #fdba74;
+  border-color: #f97316;
+  box-shadow: none;
+  animation: none;
+}
+.pay-toggle-btn.status-overdue.sev-mid {
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.35);
+  animation: none;
+}
+.due-overdue-text { color: #ef4444; font-weight: 600; white-space: nowrap; }
+.chip-count {
+  display: inline-block;
+  min-width: 18px;
+  padding: 0 6px;
+  margin-left: 4px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+}
+/* v2.3: на средних экранах прячем адрес и «Инфо» (клик по строке открывает карточку) */
+@media (max-width: 1400px) {
+  #tableViewContainer th:nth-child(4), #tableViewContainer td:nth-child(4),
+  #tableViewContainer th:nth-child(8), #tableViewContainer td:nth-child(8) { display: none; }
+}
+/* v2.3: свободный объект — без пульсации, это задача, а не авария */
+.status-cell-prominent .pay-toggle-btn.status-vacant { animation: none; box-shadow: none; background: rgba(245, 158, 11, 0.14); color: #fcd34d; border-color: #f59e0b; }
+
+#pieChartContainer { flex-direction: column; }
+#pieChartContainer svg { max-height: 240px; }
+@media (max-width: 768px) {
+  .top-bar-actions { flex-wrap: wrap; width: 100%; }
+  .search-wrapper { max-width: none; }
+  .today-list { grid-template-columns: 1fr; }
+}
+/* v2.3: компактная шапка — подписи кнопок скрываются на узких экранах */
+.page-title { white-space: nowrap; }
+.top-bar-actions { gap: 10px; min-width: 0; }
+.search-wrapper { width: auto; flex: 1 1 200px; min-width: 140px; max-width: 260px; }
+@media (max-width: 1500px) {
+  .top-bar-actions .btn-label, .top-bar-actions .theme-text { display: none; }
+  .top-bar { padding: 0 20px; }
+}
 
 /* 🚪 VACANT (Object is free / ready to rent) */
 .pay-toggle-btn.status-vacant {
@@ -3037,8 +3106,8 @@ svg .pie-slice:hover {
     <!-- Левое боковое меню (Navigation Drawer) -->
     <aside class="nav-drawer">
       <div class="brand-section">
-        <div class="brand-logo">G</div>
-        <div class="brand-title">Google Real Estate</div>
+        <div class="brand-logo">Т</div>
+        <div class="brand-title">Т.Ш. Estate</div>
       </div>
       
       <nav style="flex: 1;">
@@ -3111,17 +3180,17 @@ svg .pie-slice:hover {
           
           <button class="btn-m3 btn-m3-outlined" onclick="openBackupModal()" title="Резервное копирование и восстановление всех данных">
             <span style="font-size:14px;margin-right:4px;">💾</span>
-            <span>Бэкап</span>
+            <span class="btn-label">Бэкап</span>
           </button>
           
-          <button class="btn-m3 btn-m3-primary" onclick="exportToExcel()">
-            <span>⬇ Экспорт в Excel</span>
+          <button class="btn-m3 btn-m3-primary" onclick="exportToExcel()" title="Экспорт в Excel">
+            <span>⬇</span><span class="btn-label">&nbsp;Excel</span>
           </button>
           
           <!-- Кнопка быстрой блокировки дашборда -->
-          <button class="btn-m3 btn-m3-outlined" onclick="lockDashboard()" title="Заблокировать экран паролем (236618)" style="border-color:rgba(239,68,68,0.35);color:#fca5a5;">
+          <button class="btn-m3 btn-m3-outlined" onclick="lockDashboard()" title="Заблокировать экран" style="border-color:rgba(239,68,68,0.35);color:#fca5a5;">
             <span style="font-size:14px;margin-right:4px;">🔒</span>
-            <span>Заблокировать</span>
+            <span class="btn-label">Заблокировать</span>
           </button>
         </div>
       </header>
@@ -3144,9 +3213,9 @@ svg .pie-slice:hover {
               <div class="metrics-grid inner-grid">
                 <div class="metric-card">
                   <div class="metric-accent-line purple"></div>
-                  <span class="metric-title">Всего объектов</span>
+                  <span class="metric-title">Арендный фонд</span>
                   <span class="metric-value" id="metricTotal">0</span>
-                  <span class="metric-footer">в управлении</span>
+                  <span class="metric-footer" id="metricTotalFooter">в управлении</span>
                 </div>
                 <div class="metric-card">
                   <div class="metric-accent-line success"></div>
@@ -3162,15 +3231,15 @@ svg .pie-slice:hover {
                 </div>
                 <div class="metric-card">
                   <div class="metric-accent-line renew"></div>
-                  <span class="metric-title">Продление / Долг</span>
+                  <span class="metric-title">Требуют внимания</span>
                   <span class="metric-value" id="metricRenew" style="color:hsl(38, 95%, 75%)">0</span>
-                  <span class="metric-footer">требуют внимания</span>
+                  <span class="metric-footer">долг или договор</span>
                 </div>
                 <div class="metric-card">
                   <div class="metric-accent-line primary"></div>
                   <span class="metric-title">Занятость</span>
                   <span class="metric-value" id="metricOccupancy" style="color:var(--color-primary)">0%</span>
-                  <span class="metric-footer">загрузка фонда</span>
+                  <span class="metric-footer" id="metricOccupancyFooter">загрузка фонда</span>
                 </div>
               </div>
             </div>
@@ -3198,13 +3267,13 @@ svg .pie-slice:hover {
                   <div class="metric-accent-line danger"></div>
                   <span class="metric-title">Задолженность</span>
                   <span class="metric-value" id="metricTotalDebt" style="color:var(--color-danger)">0 ₸</span>
-                  <span class="metric-footer">долги арендаторов</span>
+                  <span class="metric-footer" id="metricTotalDebtFooter">долги арендаторов</span>
                 </div>
                 <div class="metric-card">
                   <div class="metric-accent-line primary"></div>
-                  <span class="metric-title">Прогноз / Год</span>
+                  <span class="metric-title" title="Сумма платежей на 12 месяцев вперёд по действующим договорам (без продлений)">По договорам / 12 мес</span>
                   <span class="metric-value" id="metricAnnualRent" style="color:var(--color-primary)">0 ₸</span>
-                  <span class="metric-footer">годовой доход</span>
+                  <span class="metric-footer" id="metricAnnualRentFooter">годовой доход</span>
                 </div>
               </div>
             </div>
@@ -3213,6 +3282,8 @@ svg .pie-slice:hover {
 
           <!-- Блок сбора аренды и Календарь платежей на месяц -->
           <div class="collection-timeline-container" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+            <!-- v2.3: Что сделать сегодня -->
+            <div class="today-actions-card" id="todayActionsCard"></div>
             <!-- Прогресс-бар сбора аренды -->
             <div class="monthly-collection-card" id="monthlyCollectionCard"></div>
             <!-- Визуальный календарь-таймлайн платежей -->
@@ -3416,12 +3487,21 @@ svg .pie-slice:hover {
                 <div class="util-sum-val" id="statsPotentialRent" style="color:var(--color-success)">—</div>
               </div>
               <div class="util-sum-item">
-                <div class="util-sum-label">Прогнозируемый доход/год</div>
+                <div class="util-sum-label" title="Платежи на 12 мес. вперёд по действующим договорам, без продлений">По договорам / 12 мес</div>
                 <div class="util-sum-val" id="statsAnnualRent" style="color:var(--color-primary)">—</div>
               </div>
               <div class="util-sum-item">
                 <div class="util-sum-label">Ср. ставка за 1 кв. м</div>
                 <div class="util-sum-val" id="statsAvgPriceSqm" style="color:var(--color-purple)">—</div>
+                <div id="statsAvgPriceSqmNote" style="font-size:10px;color:var(--color-warning);margin-top:4px;"></div>
+              </div>
+              <div class="util-sum-item">
+                <div class="util-sum-label" title="Фактическая аренда / потенциальная аренда всех арендных объектов">Загрузка по деньгам</div>
+                <div class="util-sum-val" id="statsFinOccupancy" style="color:var(--color-success)">—</div>
+              </div>
+              <div class="util-sum-item">
+                <div class="util-sum-label" title="Средневзвешенный по ставке срок до окончания договоров. Чем меньше — тем выше риск продлений">Ср. срок до конца договоров</div>
+                <div class="util-sum-val" id="statsWalt" style="color:var(--color-primary)">—</div>
               </div>
             </div>
           </div>
@@ -4114,7 +4194,7 @@ if (typeof module !== 'undefined' && module.exports) {
 </script>
   <!-- Подключение логики -->
   <script>
-// Google Real Estate Dashboard Application Logic (Version 2.2)
+// Т.Ш. Estate Dashboard Application Logic (Version 2.3)
 
 let currentTab = 'overview';
 let activeFilter = 'all';
@@ -4264,12 +4344,15 @@ function toggleTheme() {
 // Global render router
 function renderAll() {
   renderMetrics();
+  renderTodayActions();
   updateMonthlyCollectionBanner();
   updatePaymentTimeline();
+  updateFilterCounts();
   renderProperties();
   renderEvents();
   renderUtilities();
   renderAnalytics();
+  renderAllNotepad(); // фикс: журнал не обновлялся после автоматических заметок (сдача/освобождение)
 }
 
 // ----------------- MONTH SELECTOR STATE -----------------
@@ -4875,6 +4958,9 @@ function getComputedStatus(o) {
   }
   if (o.status === 'rented') {
     const dl = daysLeft(o.rentEnd);
+    if (dl !== null && dl < 0) {
+      return { name: 'Договор истёк', cls: 'overdue', code: 'expired' };
+    }
     if (dl !== null && dl <= 30) {
       return { name: 'Требует продления', cls: 'renew', code: 'renew_needed' };
     }
@@ -4884,6 +4970,68 @@ function getComputedStatus(o) {
     return { name: 'Продажа', cls: 'sale', code: 'sale' };
   }
   return { name: o.status, cls: o.status, code: o.status };
+}
+
+// ----------------- ЕДИНЫЙ РАСЧЁТ ОПЛАТЫ (v2.3) -----------------
+// Одно определение «просрочки» для всех блоков: метрик, сбора аренды, фильтров, таблицы.
+function getRentState(o, selDate = getSelectedMonthDate()) {
+  if (!o || o.status === 'own' || o.status === 'vacant' || o.status === 'sale') {
+    return { state: 'na', daysLate: 0, amount: 0 };
+  }
+  const amount = o.price || 0;
+  const info = getRentInfo(o.id);
+  if (info.paid) return { state: 'paid', daysLate: 0, amount, paidDate: info.paidDate };
+
+  const payDay = getPayDayNumber(o);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const lastDay = new Date(selDate.getFullYear(), selDate.getMonth() + 1, 0).getDate();
+  const due = new Date(selDate.getFullYear(), selDate.getMonth(), Math.min(payDay, lastDay));
+  const diff = Math.round((today - due) / 86400000);
+
+  if (diff > 0 || o.dept || o.status === 'overdue') {
+    const daysLate = Math.max(diff, 0);
+    const severity = daysLate > 15 ? 'high' : (daysLate > 5 ? 'mid' : 'low');
+    return { state: 'overdue', daysLate, severity, amount: o.deptAmount || amount };
+  }
+  return { state: 'pending', daysLate: 0, daysUntil: -diff, amount };
+}
+
+// Нужно ли внимание: просрочка оплаты, договор истёк или истекает ≤30 дн.
+function needsAttention(o) {
+  if (o.status === 'own' || o.status === 'vacant') return false;
+  const code = getComputedStatus(o).code;
+  return getRentState(o).state === 'overdue' || code === 'expired' || code === 'renew_needed';
+}
+
+// Доход, гарантированный действующими договорами на N месяцев вперёд (со следующего месяца).
+// Платёж учитывается, только если дата платежа строго раньше даты окончания договора.
+function getContractedIncome(months = 12) {
+  const now = new Date();
+  let total = 0;
+  getPortfolio().forEach(o => {
+    if (o.status !== 'rented' || !o.price || !o.rentEnd) return;
+    const end = new Date(o.rentEnd + 'T00:00:00');
+    const payDay = getPayDayNumber(o);
+    for (let i = 1; i <= months; i++) {
+      const y = now.getFullYear(), m = now.getMonth() + i;
+      const last = new Date(y, m + 1, 0).getDate();
+      const due = new Date(y, m, Math.min(payDay, last));
+      if (due < end) total += o.price;
+    }
+  });
+  return total;
+}
+
+// Средневзвешенный (по ставке) срок до окончания договоров, в днях. Истёкшие = 0.
+function getWeightedLeaseDays() {
+  const rented = getPortfolio().filter(o => o.status === 'rented' && o.price && o.rentEnd);
+  const sumW = rented.reduce((s, o) => s + o.price, 0);
+  if (!sumW) return 0;
+  return Math.round(rented.reduce((s, o) => s + Math.max(0, daysLeft(o.rentEnd)) * o.price, 0) / sumW);
+}
+
+function fmtTenge(n) {
+  return Math.round(n).toLocaleString('ru-KZ') + ' ₸';
 }
 
 // ----------------- SECURITY & PIN LOCK SCREEN -----------------
@@ -5095,6 +5243,11 @@ function setupSearch() {
 
 // ----------------- VIEW MODE -----------------
 function setupViewMode() {
+  // v2.3: на телефоне по умолчанию — карточки (таблица не помещается)
+  if (window.innerWidth <= 768) {
+    viewMode = 'grid';
+    document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'grid'));
+  }
   document.querySelectorAll('.view-toggle-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.view-toggle-btn').forEach(b => b.classList.remove('active'));
@@ -5114,18 +5267,24 @@ function renderMetrics() {
   const rentedCount = managed.filter(o => o.status === 'rented').length;
   const vacantCount = managed.filter(o => o.status === 'vacant' || o.status === 'sale').length;
   
-  const renewCount = managed.filter(o => {
-    const st = getComputedStatus(o);
-    return st.code === 'renew_needed' || st.code === 'overdue' || o.dept;
-  }).length;
-  
+  const renewCount = managed.filter(needsAttention).length;
+
   const occupancyRate = totalCount > 0 ? Math.round((rentedCount / totalCount) * 100) : 0;
-  
+
   const actualRentSum = managed.filter(o => o.status === 'rented').reduce((s, o) => s + (o.price || 0), 0);
   const potentialRentSum = managed.reduce((s, o) => s + (o.price || 0), 0);
   const lostRentSum = Math.max(0, potentialRentSum - actualRentSum);
-  const totalDebtSum = managed.reduce((s, o) => s + (o.deptAmount || 0), 0);
-  const annualRentSum = actualRentSum * 12;
+  // Задолженность = все неоплаченные просроченные платежи (та же логика, что в «Сборе аренды»)
+  const overdueList = managed.filter(o => getRentState(o).state === 'overdue');
+  const totalDebtSum = overdueList.reduce((s, o) => s + getRentState(o).amount, 0);
+  const annualRentSum = getContractedIncome(12);
+  const finOccupancy = potentialRentSum > 0 ? Math.round((actualRentSum / potentialRentSum) * 100) : 0;
+
+  const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setTxt('metricTotalFooter', `аренда · всего в портфеле ${portfolio.length}`);
+  setTxt('metricOccupancyFooter', `по объектам · по деньгам ${finOccupancy}%`);
+  setTxt('metricTotalDebtFooter', overdueList.length ? `${overdueList.length} об. с просрочкой` : 'просрочек нет');
+  setTxt('metricAnnualRentFooter', `если всё продлят: ${fmtTenge(actualRentSum * 12)}`);
 
   // Update DOM elements
   if (document.getElementById('metricTotal')) document.getElementById('metricTotal').textContent = totalCount;
@@ -5138,6 +5297,61 @@ function renderMetrics() {
   if (document.getElementById('metricLostRent')) document.getElementById('metricLostRent').textContent = lostRentSum.toLocaleString('ru-KZ') + ' ₸';
   if (document.getElementById('metricTotalDebt')) document.getElementById('metricTotalDebt').textContent = totalDebtSum.toLocaleString('ru-KZ') + ' ₸';
   if (document.getElementById('metricAnnualRent')) document.getElementById('metricAnnualRent').textContent = annualRentSum.toLocaleString('ru-KZ') + ' ₸';
+}
+
+// ----------------- v2.3: ЧТО СДЕЛАТЬ СЕГОДНЯ -----------------
+function renderTodayActions() {
+  const box = document.getElementById('todayActionsCard');
+  if (!box) return;
+  const managed = getPortfolio().filter(o => o.status !== 'own');
+  const tasks = [];
+
+  managed.forEach(o => {
+    const st = getComputedStatus(o);
+    const dl = daysLeft(o.rentEnd);
+    if (st.code === 'expired') {
+      tasks.push({ p: 0, icon: '📄', cls: 'high', id: o.id, text: `<b>${escapeHtml(o.name)}</b> — договор истёк ${Math.abs(dl)} дн. назад. Продлить или оформить выезд` });
+    }
+    const rs = getRentState(o);
+    if (rs.state === 'overdue') {
+      tasks.push({ p: 1 + (100 - Math.min(rs.daysLate, 99)) / 1000, icon: '💸', cls: rs.severity, id: o.id, wa: true,
+        text: `<b>${escapeHtml(o.name)}</b> — получить ${fmtTenge(rs.amount)}${rs.daysLate ? `, просрочка ${rs.daysLate} дн.` : ''}` });
+    } else if (rs.state === 'pending' && rs.daysUntil <= 1) {
+      tasks.push({ p: 2, icon: '🔔', cls: 'low', id: o.id, wa: true,
+        text: `<b>${escapeHtml(o.name)}</b> — оплата ${rs.daysUntil === 0 ? 'сегодня' : 'завтра'}: ${fmtTenge(rs.amount)}` });
+    }
+    if (st.code === 'renew_needed') {
+      tasks.push({ p: 3, icon: '⏰', cls: 'mid', id: o.id, text: `<b>${escapeHtml(o.name)}</b> — договор заканчивается через ${dl} дн. Начать переговоры о продлении` });
+    }
+    if (o.status === 'vacant') {
+      const since = o.vacatedDate ? Math.max(0, Math.floor((new Date() - new Date(o.vacatedDate)) / 86400000)) : null;
+      const lost = since !== null ? (o.price || 0) / 30.4 * since : 0;
+      tasks.push({ p: 4, icon: '🚪', cls: 'mid', id: o.id,
+        text: `<b>${escapeHtml(o.name)}</b> — свободен${since !== null ? ` ${since} дн., простой ≈ ${fmtTenge(lost)}` : ''}. Найти арендатора` });
+    }
+    if (o.nextCheck) {
+      const dc = daysLeft(o.nextCheck);
+      if (dc !== null && dc >= 0 && dc <= 7) {
+        tasks.push({ p: 5, icon: '🔍', cls: 'low', id: o.id, text: `<b>${escapeHtml(o.name)}</b> — плановый осмотр через ${dc} дн.` });
+      }
+    }
+  });
+
+  tasks.sort((a, b) => a.p - b.p);
+  const shown = tasks.slice(0, 6);
+  box.innerHTML = `
+    <div class="today-head">
+      <span>✅ Что сделать сегодня</span>
+      <span class="today-count">${tasks.length ? tasks.length + ' задач' : 'всё под контролем'}</span>
+    </div>
+    ${tasks.length ? `<div class="today-list">${shown.map(t => `
+      <div class="today-item sev-${t.cls}" onclick="openDrawer(${t.id})">
+        <span class="today-icon">${t.icon}</span>
+        <span class="today-text">${t.text}</span>
+        ${t.wa ? `<button class="today-wa" onclick="event.stopPropagation();openSmartWhatsApp(event, ${t.id})" title="Написать арендатору в WhatsApp">WhatsApp</button>` : '<span class="today-go">➔</span>'}
+      </div>`).join('')}</div>
+      ${tasks.length > shown.length ? `<div class="today-more">и ещё ${tasks.length - shown.length} — см. фильтр «Внимание»</div>` : ''}` : ''}
+  `;
 }
 
 // ----------------- MONTHLY COLLECTION PROGRESS BANNER -----------------
@@ -5166,16 +5380,13 @@ function updateMonthlyCollectionBanner() {
   rentedObjects.forEach(o => {
     const rent = o.price || 0;
     totalExpected += rent;
-    const rentInfo = getRentInfo(o.id);
-    const payDay = getPayDayNumber(o);
-    const isTodayPastDue = isCurrentMonth && (now.getDate() > payDay);
-    const isOverdue = !rentInfo.paid && (isPastMonth || isTodayPastDue || o.dept || o.status === 'overdue');
+    const rs = getRentState(o);
 
-    if (rentInfo.paid) {
+    if (rs.state === 'paid') {
       collectedAmount += rent;
       collectedCount++;
-    } else if (isOverdue) {
-      overdueAmount += (o.deptAmount || rent);
+    } else if (rs.state === 'overdue') {
+      overdueAmount += rs.amount;
       overdueCount++;
     } else {
       pendingAmount += rent;
@@ -5395,6 +5606,26 @@ function getFloatingPaymentPriority(o) {
 }
 
 // ----------------- PROPERTIES VIEW RENDERER -----------------
+function matchesFilter(o, f) {
+  if (f === 'all') return true;
+  if (f === 'rented') return o.status === 'rented';
+  if (f === 'attention') return needsAttention(o);
+  if (f === 'vacant') return o.status === 'vacant' || o.status === 'sale';
+  if (f === 'overdue') return getRentState(o).state === 'overdue' || getComputedStatus(o).code === 'expired';
+  if (f === 'sale') return !!o.alsoForSale;
+  return true;
+}
+
+// Счётчики на кнопках фильтров: «Внимание (6)»
+function updateFilterCounts() {
+  const base = getPortfolio().filter(o => o.status !== 'own');
+  document.querySelectorAll('.chip-btn[data-filter]').forEach(btn => {
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent.trim();
+    const n = base.filter(o => matchesFilter(o, btn.dataset.filter)).length;
+    btn.innerHTML = `${btn.dataset.label} <span class="chip-count">${n}</span>`;
+  });
+}
+
 function getFilteredItems() {
   const portfolio = getPortfolio();
   let items = portfolio;
@@ -5414,27 +5645,8 @@ function getFilteredItems() {
   if (activeFilter !== 'all') {
     if (activeFilter === 'rented') {
       items = items.filter(o => o.status === 'rented');
-    } else if (activeFilter === 'attention') {
-      items = items.filter(o => {
-        if (o.status === 'own' || o.status === 'vacant') return false;
-        const rentInfo = getRentInfo(o.id);
-        const payDayNum = getPayDayNumber(o);
-        const now = new Date();
-        const selDate = getSelectedMonthDate();
-        const isPastMonth = (selDate.getFullYear() < now.getFullYear()) || (selDate.getFullYear() === now.getFullYear() && selDate.getMonth() < now.getMonth());
-        const isCurrentMonth = (selDate.getFullYear() === now.getFullYear() && selDate.getMonth() === now.getMonth());
-        const isTodayPastDue = isCurrentMonth && (now.getDate() > payDayNum);
-        const isOverdue = !rentInfo.paid && (isPastMonth || isTodayPastDue);
-        const dl = daysLeft(o.rentEnd);
-        const isExpiring = dl !== null && dl <= 30;
-        return isOverdue || isExpiring;
-      });
-    } else if (activeFilter === 'vacant') {
-      items = items.filter(o => o.status === 'vacant' || o.status === 'sale');
-    } else if (activeFilter === 'overdue') {
-      items = items.filter(o => o.status !== 'vacant' && (o.status === 'overdue' || o.dept || getComputedStatus(o).code === 'renew_needed'));
-    } else if (activeFilter === 'sale') {
-      items = items.filter(o => o.alsoForSale);
+    } else {
+      items = items.filter(o => matchesFilter(o, activeFilter));
     }
   }
   
@@ -5690,12 +5902,14 @@ function renderStatusCell(o) {
     dueDateText = `Оплата: ${payDayNum}-е число (${periodStr} · опл. ${paidDateStr})`;
     tooltip = `Аренда оплачена (${paidDateStr}, период: ${periodStr}). Кликните, чтобы снять галочку [☐]`;
   } else if (isOverdue) {
-    badgeClass = 'status-overdue';
-    dotClass = 'red';
+    // v2.3: градация тревоги — 1–5 дн. оранжевый, 6–15 красный, >15 красный с пульсацией
+    const rsCell = getRentState(o, selDate);
+    const daysLate = rsCell.daysLate;
+    badgeClass = 'status-overdue sev-' + (rsCell.severity || 'high');
+    dotClass = rsCell.severity === 'low' ? 'yellow' : 'red';
     isPaid = false;
-    statusTitle = 'ПРОСРОЧЕН!';
-    const daysLate = now.getDate() - payDayNum;
-    dueDateText = `<span style="color:#ef4444;font-weight:700;">Срок был: ${payDayNum}-го (${periodStr} · ${isCurrentMonth && daysLate > 0 ? 'просрочка ' + daysLate + ' дн.' : 'просрочен'})!</span>`;
+    statusTitle = daysLate > 0 ? `ДОЛГ ${daysLate} ДН.` : 'ПРОСРОЧЕН';
+    dueDateText = `<span class="due-overdue-text">Срок ${payDayNum}-го · ${periodStr}</span>`;
     tooltip = `Внимание! Платеж просрочен (срок был ${payDayNum}-го, период: ${periodStr}). Кликните, чтобы отметить [☑ Оплатил]`;
   }
   
@@ -5763,19 +5977,13 @@ function renderTable(items, tbodyId) {
   tbody.innerHTML = items.map((o, idx) => {
     const st = getComputedStatus(o);
     const dl = daysLeft(o.rentEnd);
-    const rentInfo = getRentInfo(o.id);
-    const payDayNum = getPayDayNumber(o);
-    const selDate = getSelectedMonthDate();
-    const now = new Date();
-    const isPastMonth = (selDate.getFullYear() < now.getFullYear()) || (selDate.getFullYear() === now.getFullYear() && selDate.getMonth() < now.getMonth());
-    const isTodayPastDue = (selDate.getFullYear() === now.getFullYear() && selDate.getMonth() === now.getMonth()) && (now.getDate() > payDayNum);
-    const isOverdue = o.status !== 'vacant' && o.status !== 'own' && !rentInfo.paid && (isPastMonth || isTodayPastDue || o.dept || o.status === 'overdue');
-    
+    const rs = getRentState(o);
+
     let rowClass = '';
     if (o.status === 'vacant') rowClass = 'row-vacant';
-    else if (rentInfo.paid) rowClass = 'row-paid';
-    else if (isOverdue || st.code === 'overdue') rowClass = 'row-overdue';
-    else if (st.code === 'renew_needed') rowClass = 'row-renew';
+    else if (rs.state === 'paid') rowClass = 'row-paid';
+    else if (rs.state === 'overdue') rowClass = rs.severity === 'low' ? 'row-renew' : 'row-overdue';
+    else if (st.code === 'renew_needed' || st.code === 'expired') rowClass = 'row-renew';
     
     let termHtml = '—';
     if (dl !== null) {
@@ -5898,6 +6106,7 @@ function getStatusName(status) {
     vacant: 'Свободен',
     overdue: 'Просрочка',
     renew_needed: 'Требует продления',
+    expired: 'Договор истёк',
     own: 'Своё',
     sale: 'Продажа'
   };
@@ -5933,7 +6142,9 @@ function openDrawer(id) {
   
   let alertBoxHtml = '';
   if (o.status === 'overdue' || (dl !== null && dl <= 0) || o.dept) {
-    let alertMsg = 'Договор аренды просрочен.';
+    let alertMsg = (dl !== null && dl <= 0)
+      ? `Договор аренды истёк ${Math.abs(dl)} дн. назад. Продлите договор (доп. соглашение) или оформите выезд — иначе доход по объекту не защищён договором.`
+      : 'Договор аренды просрочен.';
     if (o.dept) alertMsg = `Задолженность по аренде: <b>${o.deptAmount.toLocaleString('ru-KZ')} ₸</b>.`;
     alertBoxHtml = `
       <div class="drawer-alert-box">
@@ -6339,7 +6550,7 @@ function openDrawer(id) {
     <div class="drawer-section">
       <div class="drawer-section-title">Расположение</div>
       <div class="map-placeholder">
-        📍 Астана, Казахстан (Google Maps API Offline)
+        📍 Астана, Казахстан
       </div>
     </div>
   `;
@@ -6566,7 +6777,7 @@ function renderAllNotepad() {
   
   populateNotepadPropertySelect();
   const notes = getAllJournalNotes();
-  if (countBadge) countBadge.textContent = `${notes.length} записей`;
+  if (countBadge) { const n = notes.length, m10 = n % 10, m100 = n % 100; countBadge.textContent = `${n} ${m10 === 1 && m100 !== 11 ? 'запись' : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? 'записи' : 'записей')}`; }
   
   if (!notes.length) {
     feedContainer.innerHTML = `
@@ -6779,8 +6990,14 @@ function renderAnalytics() {
   const totalRentActive = managed.filter(o => o.status === 'rented').reduce((s, o) => s + (o.price || 0), 0);
   const totalRentPotential = managed.reduce((s, o) => s + (o.price || 0), 0);
   const annualRentActive = totalRentActive * 12;
-  const averagePricePerSqm = totalRentActive / (rentedSqm || 1);
+  // v2.3: ставка за м² считается только по объектам, где указана площадь
+  const withArea = managed.filter(o => o.status === 'rented' && o.area && o.price);
+  const rentWithArea = withArea.reduce((s, o) => s + o.price, 0);
+  const areaWithPrice = withArea.reduce((s, o) => s + o.area, 0);
+  const averagePricePerSqm = areaWithPrice ? rentWithArea / areaWithPrice : 0;
+  const missingArea = managed.filter(o => o.status === 'rented' && !o.area).map(o => o.name);
   
+  let expired = 0;
   let expires30 = 0;
   let expires90 = 0;
   let expiresLong = 0;
@@ -6788,7 +7005,8 @@ function renderAnalytics() {
     if (o.status === 'rented' && o.rentEnd) {
       const dl = daysLeft(o.rentEnd);
       if (dl !== null) {
-        if (dl <= 30) expires30++;
+        if (dl < 0) expired++;
+        else if (dl <= 30) expires30++;
         else if (dl <= 90) expires90++;
         else expiresLong++;
       }
@@ -6798,8 +7016,14 @@ function renderAnalytics() {
   if (document.getElementById('statsTotalSqm')) document.getElementById('statsTotalSqm').textContent = totalSqm ? totalSqm.toLocaleString('ru-RU') + ' м²' : '—';
   if (document.getElementById('statsRentedSqm')) document.getElementById('statsRentedSqm').textContent = rentedSqm ? rentedSqm.toLocaleString('ru-RU') + ' м²' : '—';
   if (document.getElementById('statsPotentialRent')) document.getElementById('statsPotentialRent').textContent = totalRentPotential.toLocaleString('ru-KZ') + ' ₸/мес';
-  if (document.getElementById('statsAnnualRent')) document.getElementById('statsAnnualRent').textContent = annualRentActive.toLocaleString('ru-KZ') + ' ₸/год';
-  if (document.getElementById('statsAvgPriceSqm')) document.getElementById('statsAvgPriceSqm').textContent = Math.round(averagePricePerSqm).toLocaleString('ru-KZ') + ' ₸/м²';
+  if (document.getElementById('statsAnnualRent')) document.getElementById('statsAnnualRent').textContent = getContractedIncome(12).toLocaleString('ru-KZ') + ' ₸';
+  if (document.getElementById('statsAvgPriceSqm')) document.getElementById('statsAvgPriceSqm').textContent = averagePricePerSqm ? Math.round(averagePricePerSqm).toLocaleString('ru-KZ') + ' ₸/м²' : '—';
+  const sqmNote = document.getElementById('statsAvgPriceSqmNote');
+  if (sqmNote) sqmNote.textContent = missingArea.length ? `без площади: ${missingArea.join(', ')}` : '';
+  const finOcc = totalRentPotential ? Math.round(totalRentActive / totalRentPotential * 100) : 0;
+  if (document.getElementById('statsFinOccupancy')) document.getElementById('statsFinOccupancy').textContent = finOcc + '%';
+  const walt = getWeightedLeaseDays();
+  if (document.getElementById('statsWalt')) { const el = document.getElementById('statsWalt'); el.textContent = (walt / 30.4).toFixed(1).replace('.', ',') + ' мес.'; el.title = walt + ' дн.'; }
   
   // Bar chart
   const barChartContainer = document.getElementById('barChartContainer');
@@ -6826,12 +7050,13 @@ function renderAnalytics() {
         
         bars += `<rect class="bar" x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="4"
                    onmouseover="showChartTooltip(event, '${o.name}: ${o.price.toLocaleString('ru-KZ')} ₸')"
-                   onmouseout="hideChartTooltip()" onclick="openDrawer(${o.id})"></rect>`;
+                   onmouseout="hideChartTooltip()" onclick="openDrawer(${o.id})"></rect>
+                 <text x="${x + barWidth / 2}" y="${y - 4}" font-size="8" font-weight="700" text-anchor="middle" fill="var(--color-text)">${Math.round(o.price / 1000)}</text>`;
         
         const textX = x + barWidth / 2;
         const textY = h - padding + 15;
-        const shortName = o.name.substring(0, 5) + '..';
-        labels += `<text x="${textX}" y="${textY}" font-size="8" text-anchor="middle" fill="var(--color-text-secondary)">${shortName}</text>`;
+        const shortName = o.name.length > 11 ? o.name.substring(0, 10) + '…' : o.name;
+        labels += `<text x="${textX}" y="${textY}" font-size="8" text-anchor="end" transform="rotate(-30 ${textX} ${textY})" fill="var(--color-text-secondary)">${shortName}</text>`;
       });
       
       let grids = '';
@@ -6841,7 +7066,7 @@ function renderAnalytics() {
         const gridVal = Math.round(maxPrice - (maxPrice / gridSteps) * i);
         grids += `
           <line x1="${padding}" y1="${gridY}" x2="${w - padding}" y2="${gridY}" stroke="var(--color-border)" stroke-dasharray="2,2"></line>
-          <text x="${padding - 8}" y="${gridY + 3}" font-size="8" text-anchor="end" fill="var(--color-text-secondary)">${(gridVal/1000)}k ₸</text>
+          <text x="${padding - 8}" y="${gridY + 3}" font-size="8" text-anchor="end" fill="var(--color-text-secondary)">${Math.round(gridVal/1000)} тыс.</text>
         `;
       }
       
@@ -6856,7 +7081,7 @@ function renderAnalytics() {
     const center = size / 2;
     const radius = 70;
     const innerRadius = 45;
-    const counts = { rented: 0, vacant: 0, overdue: 0, own: 0, renew_needed: 0 };
+    const counts = { rented: 0, vacant: 0, overdue: 0, own: 0, renew_needed: 0, expired: 0 };
     
     portfolio.forEach(o => {
       const code = getComputedStatus(o).code;
@@ -6872,6 +7097,7 @@ function renderAnalytics() {
       const colors = {
         rented: 'var(--color-success)',
         renew_needed: 'hsl(38, 90%, 55%)',
+        expired: '#991b1b',
         vacant: 'var(--color-warning)',
         overdue: 'var(--color-danger)',
         own: 'var(--color-purple)'
@@ -6912,6 +7138,9 @@ function renderAnalytics() {
             ${total} объектов
           </text>
         </svg>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:8px;font-size:11px;color:var(--color-text-secondary);">
+          ${Object.entries(counts).filter(([, c]) => c > 0).map(([st, c]) => `<span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:50%;background:${colors[st]};"></span>${getStatusName(st)}: <b style="color:var(--color-text)">${c}</b></span>`).join('')}
+        </div>
       `;
     }
   }
@@ -6923,6 +7152,7 @@ function renderAnalytics() {
     const h = 220;
     const padding = 45;
     const pipelineData = [
+      { label: 'Истёк', count: expired, color: '#991b1b' },
       { label: '< 30 дней', count: expires30, color: 'var(--color-danger)' },
       { label: '30-90 дней', count: expires90, color: 'var(--color-warning)' },
       { label: '90+ дней', count: expiresLong, color: 'var(--color-success)' }
@@ -6932,7 +7162,7 @@ function renderAnalytics() {
     const chartWidth = w - padding * 2;
     const chartHeight = h - padding * 2;
     const barWidth = 60;
-    const barSpacing = (chartWidth - barWidth * 3) / 2;
+    const barSpacing = (chartWidth - barWidth * pipelineData.length) / (pipelineData.length - 1);
     
     let bars = '';
     let labels = '';
@@ -6942,7 +7172,7 @@ function renderAnalytics() {
       const barH = (d.count / maxVal) * chartHeight;
       const y = h - padding - barH;
       
-      bars += `<rect class="bar" x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="4" fill="${d.color}"
+      bars += `<rect class="bar" x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="4" style="fill:${d.color}"
                  onmouseover="showChartTooltip(event, '${d.label}: ${d.count} дог.')"
                  onmouseout="hideChartTooltip()"></rect>`;
       
@@ -6992,13 +7222,14 @@ function renderAnalytics() {
     let labels = '';
     
     sectorData.forEach((d, i) => {
-      const x = padding + i * (barWidth + barSpacing) + (barSpacing / 4);
+      const x = padding + (chartWidth / sectorData.length) * i + (chartWidth / sectorData.length - barWidth) / 2;
       const barH = (d.avg / maxAvgVal) * chartHeight;
       const y = h - padding - barH;
       
-      bars += `<rect class="bar" x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="4" fill="${d.color}"
+      bars += `<rect class="bar" x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="4" style="fill:${d.color}"
                  onmouseover="showChartTooltip(event, '${d.label}: ${d.avg.toLocaleString('ru-KZ')} ₸/м²')"
-                 onmouseout="hideChartTooltip()"></rect>`;
+                 onmouseout="hideChartTooltip()"></rect>
+                 <text x="${x + barWidth / 2}" y="${y - 6}" font-size="10" font-weight="700" text-anchor="middle" fill="var(--color-text)">${d.avg.toLocaleString('ru-RU')} ₸</text>`;
       
       const textX = x + barWidth / 2;
       const textY = h - padding + 15;
@@ -7121,7 +7352,7 @@ function exportToExcel() {
   XLSX.utils.book_append_sheet(wb, ws, 'Портфель ТШ');
   
   const dateStr = new Date().toISOString().slice(0, 10);
-  XLSX.writeFile(wb, `Google_Недвижимость_ТШ_${dateStr}.xlsx`);
+  XLSX.writeFile(wb, `Недвижимость_ТШ_${dateStr}.xlsx`);
 }
 
 // ==========================================================================
